@@ -54,6 +54,6 @@ function Behaviour:UnitMoveFailed(unit)
 	self:UnitIdle(unit)
 end
 
-function Behaviour:OwnerDied()
+function Behaviour:OwnerDestroyed()
 	return
 end

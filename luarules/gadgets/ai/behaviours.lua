@@ -7,10 +7,9 @@ osso_include(  "bootbehaviour" )
 behaviours = { }
 
 function defaultBehaviours(unit)
-	b = {}
-	u = unit:Internal()
+	local b = {}
 	table.insert(b, BootBehaviour )
-	if u:CanBuild() then
+	if unit.def.isBuilder then
 		table.insert(b,TaskQueueBehaviour)
 	else
 		if IsAttacker(unit) then

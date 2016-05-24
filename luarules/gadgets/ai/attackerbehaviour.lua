@@ -2,7 +2,7 @@ osso_include( "attackers" )
 
 function IsAttacker(unit)
 	for i,name in ipairs(attackerlist) do
-		if name == unit:Internal():Name() then
+		if name == unit:Name() then
 			return true
 		end
 	end
@@ -15,36 +15,27 @@ function AttackerBehaviour:Init()
 	--game:SendToConsole("attacker!")
 end
 
-function AttackerBehaviour:UnitFinished(unit)
-	if unit.engineID == self.unit.engineID then
-		self.attacking = false
-		ai.attackhandler:AddRecruit(self)
-	end
-end
-
-
-function AttackerBehaviour:UnitDestroyed(unit)
-	if unit.engineID == self.unit.engineID then
-		ai.attackhandler:RemoveRecruit(self)
-	end
+function AttackerBehaviour:OwnerFinished()
+	self.attacking = false
+	self.ai.attackhandler:AddRecruit(self)
 end
 
 function AttackerBehaviour:UnitIdle(unit)
 	if unit.engineID == self.unit.engineID then
 		self.attacking = false
-		ai.attackhandler:AddRecruit(self)
+		self.ai.attackhandler:AddRecruit(self)
 	end
 end
 
 function AttackerBehaviour:AttackCell(cell)
-	p = api.Position()
+	p = {}
 	p.x = cell.posx
 	p.z = cell.posz
-	p.y = 0
+	p.y = Spring.GetGroundHeight(p.x, p.z)
 	self.target = p
 	self.attacking = true
 	if self.active then
-		self.unit:Internal():MoveAndFire(self.target)
+		Spring.GiveOrderToUnit( self.unitID, CMD.FIGHT, { p.x, p.y, p.z }, {} )
 	else
 		self.unit:ElectBehaviour()
 	end
@@ -61,16 +52,17 @@ end
 function AttackerBehaviour:Activate()
 	self.active = true
 	if self.target then
-		self.unit:Internal():MoveAndFire(self.target)
+		local p = self.target
+		Spring.GiveOrderToUnit( self.unitID, CMD.FIGHT, { p.x, p.y, p.z }, {} )
 		self.target = nil
 	else
-		ai.attackhandler:AddRecruit(self)
+		self.ai.attackhandler:AddRecruit(self)
 	end
 end
 
 
-function AttackerBehaviour:OwnerDied()
-	ai.attackhandler:RemoveRecruit(self)
+function AttackerBehaviour:OwnerDestroyed()
+	self.ai.attackhandler:RemoveRecruit(self)
 	self.attacking = nil
 	self.active = nil
 	self.unit = nil

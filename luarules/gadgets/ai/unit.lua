@@ -52,6 +52,11 @@ function Unit:UnitFinished(unitID)
 	for k,v in pairs(self.behaviours) do
 		v:UnitFinished(unitID)
 	end
+	if unitID == self.unitID then
+		for k,v in pairs(self.behaviours) do
+			v:OwnerFinished()
+		end
+	end
 end
 
 function Unit:UnitDestroyed(unitID)
@@ -61,7 +66,7 @@ function Unit:UnitDestroyed(unitID)
 	if unitID == self.unitID then
 		if self.behaviours then
 			for k,v in pairs(self.behaviours) do
-				self.behaviours[k]:OwnerDied()
+				self.behaviours[k]:OwnerDestroyed()
 				self.behaviours[k] = nil
 			end
 			self.behaviours = nil
@@ -74,17 +79,32 @@ function Unit:UnitDamaged(unitID, unitDefID, unitTeamId, damage, paralyzer, weap
 	for k,v in pairs(self.behaviours) do
 		v:UnitDamaged(unitID, unitDefID, unitTeamId, damage, paralyzer, weaponDefID, projectileID, attackerID, attackerDefID, attackerTeamID)
 	end
+	if unitID == self.unitID then
+		for k,v in pairs(self.behaviours) do
+			v:OwnerDamaged(damage, paralyzer, weaponDefID, projectileID, attackerID, attackerDefID, attackerTeamID)
+		end
+	end
 end
 
 function Unit:UnitIdle(unitID)
 	for k,v in pairs(self.behaviours) do
 		v:UnitIdle(unitID)
 	end
+	if unitID == self.unitID then
+		for k,v in pairs(self.behaviours) do
+			v:OwnerIdle()
+		end
+	end
 end
 
 function Unit:UnitMoveFailed(unitID)
 	for k,v in pairs(self.behaviours) do
 		v:UnitMoveFailed(unitID)
+	end
+	if unitID == self.unitID then
+		for k,v in pairs(self.behaviours) do
+			v:OwnerMoveFailed()
+		end
 	end
 end
 

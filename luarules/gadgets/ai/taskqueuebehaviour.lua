@@ -121,7 +121,7 @@ function TaskQueueBehaviour:ProgressQueue()
 				self.progress = false
 			elseif action == "moverelative" then
 				local upos = self.unit:Internal():GetPosition()
-				local newpos = api.Position()
+				local newpos = {}
 				newpos.x = upos.x + value.position.x
 				newpos.y = upos.y + value.position.y
 				newpos.z = upos.z + value.position.z
