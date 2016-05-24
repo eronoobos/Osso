@@ -17,6 +17,7 @@ osso_include("behaviourfactory")
 osso_include("unit")
 osso_include("module")
 osso_include("modules")
+osso_include("ai")
 
 local AIs = {}
 Osso = {}
@@ -47,7 +48,7 @@ function gadget:Initialize()
 
 	for i=1,#teamList do
 		local id = teamList[i]
-		local _,_,_,isAI,side,allyId = spGetTeamInfo(id)
+		local _,_,_,isAI,side,allyID = spGetTeamInfo(id)
         
 		--spEcho("Player " .. teamList[i] .. " is " .. side .. " AI=" .. tostring(isAI))
 
@@ -58,9 +59,9 @@ function gadget:Initialize()
 				numberOfOssoAITeams = numberOfOssoAITeams + 1
 				spEcho("Player " .. teamList[i] .. " is " .. aiInfo)
 				-- add AI object
-				thisAI = VFS.Include("luarules/gadgets/ai/ai.lua")
-				thisAI.id = id
-				thisAI.allyId = allyId
+				thisAI = AI()
+				thisAI:SetTeamID(id)
+				thisAI:SetallyID(allyID)
 				-- thisAI:Init()
 				AIs[#AIs+1] = thisAI
 			else
@@ -189,7 +190,7 @@ function gadget:UnitTaken(unitID, unitDefID, teamID, newTeamID)
 		local thisAI = AIs[i]
 		if teamID == thisAI.id or newTeamID == thisAI.id then
 	    	prepareTheAI(thisAI)
-			thisAI:UnitTaken(unitID, unitDefID, teamID, newTeamID)
+			-- thisAI:UnitTaken(unitID, unitDefID, teamID, newTeamID)
 		end
 	end
 end
@@ -199,7 +200,7 @@ function gadget:UnitGiven(unitID, unitDefID, teamID, oldTeamID)
 		local thisAI = AIs[i]
 		if teamID == thisAI.id or oldTeamID == thisAI.id then
 	    	prepareTheAI(thisAI)
-			thisAI:UnitGiven(unitID, unitDefID, teamID, oldTeamID)
+			-- thisAI:UnitGiven(unitID, unitDefID, teamID, oldTeamID)
 		end
 	end
 end

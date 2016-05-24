@@ -12,7 +12,7 @@ function BehaviourFactory:AddBehaviours(unit)
 	end
 	-- add behaviours here
 	-- unit:AddBehaviour(behaviour)
-	local b = behaviours[unit:Internal():Name()]
+	local b = behaviours[unit:Name()]
 	if b == nil then
 		b = defaultBehaviours(unit)
 	end

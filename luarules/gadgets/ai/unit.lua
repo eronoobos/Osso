@@ -4,10 +4,20 @@ function Unit:SetUnitInfo(unitID, unitDefID, builderID)
 	self.unitID = unitID
 	self.defID = unitDefID
 	self.builderID = builderID
+	self.def = UnitDefs[unitDefID]
+	self.name = self.def.name
 end
 
 function Unit:ID()
 	return self.unitID
+end
+
+function Unit:Name()
+	return self.name
+end
+
+function Unit:Def()
+	return self.def
 end
 
 function Unit:Init(ai)

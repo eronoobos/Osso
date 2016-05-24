@@ -1,40 +1,20 @@
-if not ShardSpringLua then
-	-- globals
-	require("preload/globals")
+AI = class(AIBase)
+
+function AI:SetTeamID(teamID)
+	self.id = teamID
 end
-local AI = class(AIBase)
+
+function AI:SetAllyID(allyID)
+	self.allyID = allyID
+end
 
 function AI:Init()
-	ai = self
-	self.api = osso_include("preload/api")
-	self.game = self.api.game
-	self.map = self.api.map
-	self.game.ai = self
-	self.map.ai = self
-	self.game.map = self.map
-	self.game:SendToConsole("Shard by AF - playing:"..self.game:GameName().." on:"..self.map:MapName())
-
-	ai = self
-	game = self.game
-	map = self.map
-
-	if not ShardSpringLua then
-		osso_include("behaviourfactory")
-		osso_include("unit")
-		osso_include("module")
-		osso_include("modules")
-	end
-
+	Spring.Echo("Osso - playing:".. Game.gameShortName .. " on: " .. Game.mapName)
 	self.modules = {}
 	if next(modules) ~= nil then
 		for i,m in ipairs(modules) do
 			newmodule = m()
-			self.game:SendToConsole("adding "..newmodule:Name().." module")
-			local internalname = newmodule:internalName()
-			self[internalname] = newmodule
-			table.insert(self.modules,newmodule)
-			newmodule:SetAI(self)
-			newmodule:Init()
+			self:AddModule(newmodule)
 		end
 	end
 end
@@ -45,7 +25,7 @@ function AI:Update()
 	end
 	for i,m in ipairs(self.modules) do
 		if m == nil then
-			self.game:SendToConsole("nil module!")
+			Spring.Echo("nil module!")
 		else
 			m:Update()
 		end
@@ -58,87 +38,64 @@ function AI:GameMessage(text)
 	end
 	for i,m in ipairs(self.modules) do
 		if m == nil then
-			self.game:SendToConsole("nil module!")
+			Spring.Echo("nil module!")
 		else
 			m:GameMessage(text)
 		end
 	end
 end
 
-function AI:UnitCreated(engineunit)
+function AI:UnitCreated(unitID, unitDefID, teamID, builderID)
 	if self.gameend == true then
 		return
 	end
-	if engineunit == nil then
-		self.game:SendToConsole("shard found nil engineunit")
-		return
-	end
 	for i,m in ipairs(self.modules) do
-		m:UnitCreated(engineunit)
+		m:UnitCreated(unitID, unitDefID, teamID, builderID)
 	end
 end
 
-function AI:UnitFinished(engineunit)
+function AI:UnitFinished(unitID, unitDefID, teamID)
 	if self.gameend == true then
 		return
 	end
-	if engineunit == nil then
-		self.game:SendToConsole("shard-warning: unitbuilt engineunit nil ")
-		return
-	end
 	for i,m in ipairs(self.modules) do
-		m:UnitFinished(engineunit)
+		m:UnitFinished(unitID, unitDefID, teamID)
 	end
 end
 
-function AI:UnitDestroyed(engineunit)
+function AI:UnitDestroyed(unitID, unitDefID, teamID, attackerId, attackerDefId, attackerTeamId)
 	if self.gameend == true then
 		return
 	end
-	if engineunit == nil then
-		return
-	end
 	for i,m in ipairs(self.modules) do
-		m:UnitDestroyed(engineunit)
+		m:UnitDestroyed(unitID, unitDefID, teamID, attackerId, attackerDefId, attackerTeamId)
 	end
 end
 
-function AI:UnitIdle(engineunit)
+function AI:UnitIdle(unitID, unitDefID, teamID)
 	if self.gameend == true then
 		return
 	end
-	if engineunit == nil then
-		self.game:SendToConsole("shard-warning: idle engineunit nil")
-		return
-	end
-	
 	for i,m in ipairs(self.modules) do
-		m:UnitIdle(engineunit)
+		m:UnitIdle(unitID, unitDefID, teamID)
 	end
 end
 
-function AI:UnitDamaged(engineunit,engineattacker,enginedamage)
+function AI:UnitDamaged(unitID, unitDefID, unitTeamId, damage, paralyzer, weaponDefId, projectileId, attackerId, attackerDefId, attackerTeamId)
 	if self.gameend == true then
 		return
 	end
-	if engineunit == nil then
-		return
-	end
-	-- self.game:SendToConsole("UnitDamage for " .. enginedamage:Damage())
 	for i,m in ipairs(self.modules) do
-		m:UnitDamaged(engineunit,engineattacker,enginedamage)
+		m:UnitDamaged(unitID, unitDefID, unitTeamId, damage, paralyzer, weaponDefId, projectileId, attackerId, attackerDefId, attackerTeamId)
 	end
 end
 
-function AI:UnitMoveFailed(engineunit)
+function AI:UnitMoveFailed(unitID)
 	if self.gameend == true then
 		return
 	end
-	if engineunit == nil then
-		return
-	end
 	for i,m in ipairs(self.modules) do
-		m:UnitMoveFailed(engineunit)
+		m:UnitMoveFailed(unitID)
 	end
 end
 
@@ -150,15 +107,10 @@ function AI:GameEnd()
 end
 
 function AI:AddModule( newmodule )
+	Spring.Echo("adding "..newmodule:Name().." module")
 	local internalname = newmodule:internalName()
 	self[internalname] = newmodule
 	table.insert(self.modules,newmodule)
+	newmodule:SetAI(self)
 	newmodule:Init()
-end
-
--- create and use an AI
-if ShardSpringLua then
-	return AI()
-else
-	ai = AI()
 end

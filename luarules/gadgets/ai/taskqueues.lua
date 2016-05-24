@@ -2,7 +2,7 @@
  Task Queues!
 ]]--
 
-math.randomseed( os.time() )
+math.randomseed( Osso.randomseed )
 math.random(); math.random(); math.random()
 
 function CoreWindSolar()

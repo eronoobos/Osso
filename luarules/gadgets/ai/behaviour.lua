@@ -30,13 +30,6 @@ function Behaviour:SetUnit(unit)
 	self.unitID = unit.unitID
 end
 
-function Behaviour:SetAI(ai)
-	self.ai = ai
-	self.game = ai.game
-	self.map = ai.map
-end
-
-
 function Behaviour:IsActive()
 	return self.active
 end
