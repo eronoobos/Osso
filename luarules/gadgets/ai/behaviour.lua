@@ -9,19 +9,31 @@ end
 function Behaviour:GameEnd()
 end
 
-function Behaviour:UnitCreated(unit)
+function Behaviour:UnitCreated(unitID)
 end
 
-function Behaviour:UnitFinished(unit)
+function Behaviour:UnitFinished(unitID)
 end
 
-function Behaviour:UnitDestroyed(unit)
+function Behaviour:OwnerFinished()
 end
 
-function Behaviour:UnitDamaged(unit,attacker,damage)
+function Behaviour:UnitDestroyed(unitID)
 end
 
-function Behaviour:UnitIdle(unit)
+function Behaviour:OwnerDestroyed()
+end
+
+function Behaviour:UnitDamaged(unitID, attackerID, damage, paralyzer, weaponDefID, projectileID, attackerID, attackerDefID, attackerTeamID)
+end
+
+function Behaviour:OwnerDamaged(damage, paralyzer, weaponDefID, projectileID, attackerID, attackerDefID, attackerTeamID)
+end
+
+function Behaviour:UnitIdle(unitID)
+end
+
+function Behaviour:OwnerIdle()
 end
 
 function Behaviour:SetUnit(unit)
@@ -51,10 +63,9 @@ function Behaviour:Passive()
 	return false
 end
 
-function Behaviour:UnitMoveFailed(unit)
-	self:UnitIdle(unit)
+function Behaviour:UnitMoveFailed(unitID)
+	self:UnitIdle(unitID)
 end
 
-function Behaviour:OwnerDestroyed()
-	return
+function Behaviour:OwnerMoveFailed()
 end

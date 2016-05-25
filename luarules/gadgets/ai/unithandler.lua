@@ -57,7 +57,7 @@ function UnitHandler:UnitDamaged(unitID, unitDefID, unitTeamId, damage, paralyze
 end
 
 function UnitHandler:UnitIdle(unitID)
-	for k,v in pairs(self.units) do
+	for k,v in pairs(self.myUnits) do
 		v:UnitIdle(unitID)
 	end
 end
@@ -67,7 +67,7 @@ function UnitHandler:AIRepresentation(unitID, unitDefID, teamID, builderID)
 		return nil
 	end
 	local u = self.myUnits[unitID]
-	if u == nil and  then
+	if u == nil then
 		u = Unit()
 		u:SetUnitInfo(unitID, unitDefID, builderID)
 		u:Init(self.ai)

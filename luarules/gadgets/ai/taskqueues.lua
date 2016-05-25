@@ -2,9 +2,6 @@
  Task Queues!
 ]]--
 
-math.randomseed( Osso.randomseed )
-math.random(); math.random(); math.random()
-
 function CoreWindSolar()
 	if game:AverageWind() > 10 then
 		return "corwind"

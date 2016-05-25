@@ -1,5 +1,7 @@
 AttackHandler = class(Module)
 
+local spGetUnitPosition = Spring.GetUnitPosition
+
 function AttackHandler:Name()
 	return "AttackHandler"
 end

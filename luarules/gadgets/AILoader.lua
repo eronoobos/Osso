@@ -10,6 +10,10 @@ function gadget:GetInfo()
    }
 end
 
+local AIs = {}
+Osso = {}
+Osso.AIs = AIs
+
 -- globals
 VFS.Include("luarules/gadgets/ai/preload/globals.lua")
 
@@ -18,10 +22,6 @@ osso_include("unit")
 osso_include("module")
 osso_include("modules")
 osso_include("ai")
-
-local AIs = {}
-Osso = {}
-Osso.AIs = AIs
 
 -- localization
 local spEcho = Spring.Echo
@@ -33,9 +33,6 @@ local spGetTeamStartPosition = Spring.GetTeamStartPosition
 local spGetTeamUnits = Spring.GetTeamUnits
 local spGetAllUnits = Spring.GetAllUnits
 local spGetUnitTeam = Spring.GetUnitTeam
-local spGetUnitPosition = Spring.GetUnitPosition
-local spGiveOrderToUnit = Spring.GiveOrderToUnit
-local spGetGroundHeight = Spring.GetGroundHeight
 
 local function prepareTheAI(thisAI)
 	if not thisAI.modules then thisAI:Init() end
@@ -64,7 +61,7 @@ function gadget:Initialize()
 				-- add AI object
 				thisAI = AI()
 				thisAI:SetTeamID(id)
-				thisAI:SetallyID(allyID)
+				thisAI:SetAllyID(allyID)
 				-- thisAI:Init()
 				AIs[#AIs+1] = thisAI
 			else
@@ -221,6 +218,8 @@ function gadget:GameID(gameID)
 		end
 		-- Spring.Echo("randomseed", rseed)
 		Osso.randomseed = rseed
+		math.randomseed( rseed )
+		math.random(); math.random(); math.random()
 	end
 end
 

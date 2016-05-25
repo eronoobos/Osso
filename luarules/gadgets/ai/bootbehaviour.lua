@@ -10,6 +10,9 @@ BootBehaviour = class(Behaviour)
 
 local MOVESTATE_HOLDPOS = 0
 
+local spGetGameFrame = Spring.GetGameFrame
+local spGiveOrderToUnit = Spring.GiveOrderToUnit
+
 function BootBehaviour:Init()
 	self.waiting = true
 	self.finished = false
@@ -17,10 +20,8 @@ function BootBehaviour:Init()
 	self.unit:ElectBehaviour()
 end
 
-function BootBehaviour:UnitFinished(unit)
-	if unit.engineID == self.unit.engineID then
-		self.finished = true
-	end
+function BootBehaviour:OwnerFinished()
+	self.finished = true
 end
 
 function BootBehaviour:Update()
@@ -46,7 +47,7 @@ end
 
 function BootBehaviour:Priority()
 	-- don't apply to starting units
-	if self.ai.frame < 5 then
+	if spGetGameFrame() < 5 then
 		return 0
 	end
 

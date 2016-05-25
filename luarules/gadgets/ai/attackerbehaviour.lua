@@ -11,6 +11,9 @@ end
 
 AttackerBehaviour = class(Behaviour)
 
+local spGetGroundHeight = Spring.GetGroundHeight
+local spGiveOrderToUnit = Spring.GiveOrderToUnit
+
 function AttackerBehaviour:Init()
 	--game:SendToConsole("attacker!")
 end
@@ -20,22 +23,20 @@ function AttackerBehaviour:OwnerFinished()
 	self.ai.attackhandler:AddRecruit(self)
 end
 
-function AttackerBehaviour:UnitIdle(unit)
-	if unit.engineID == self.unit.engineID then
-		self.attacking = false
-		self.ai.attackhandler:AddRecruit(self)
-	end
+function AttackerBehaviour:OwnerIdle()
+	self.attacking = false
+	self.ai.attackhandler:AddRecruit(self)
 end
 
 function AttackerBehaviour:AttackCell(cell)
 	p = {}
 	p.x = cell.posx
 	p.z = cell.posz
-	p.y = Spring.GetGroundHeight(p.x, p.z)
+	p.y = spGetGroundHeight(p.x, p.z)
 	self.target = p
 	self.attacking = true
 	if self.active then
-		Spring.GiveOrderToUnit( self.unitID, CMD.FIGHT, { p.x, p.y, p.z }, {} )
+		spGiveOrderToUnit( self.unitID, CMD.FIGHT, { p.x, p.y, p.z }, {} )
 	else
 		self.unit:ElectBehaviour()
 	end
@@ -53,7 +54,7 @@ function AttackerBehaviour:Activate()
 	self.active = true
 	if self.target then
 		local p = self.target
-		Spring.GiveOrderToUnit( self.unitID, CMD.FIGHT, { p.x, p.y, p.z }, {} )
+		spGiveOrderToUnit( self.unitID, CMD.FIGHT, { p.x, p.y, p.z }, {} )
 		self.target = nil
 	else
 		self.ai.attackhandler:AddRecruit(self)

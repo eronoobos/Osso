@@ -1,9 +1,12 @@
 TaskQueueBehaviour = class(Behaviour)
 
+local spGetGroundHeight = Spring.GetGroundHeight
+local spGiveOrderToUnit = Spring.GiveOrderToUnit
+local spGetUnitPosition = Spring.GetUnitPosition
+
 local function canBuildHere(unitDefID, position) -- returns boolean
 	local newX, newY, newZ = Spring.Pos2BuildPos(unitDefID, position.x, position.y, position.z)
 	local blocked = Spring.TestBuildOrder(unitDefID, newX, newY, newZ, 1) == 0
-	-- Spring.Echo(unittype:Name(), newX, newY, newZ, blocked)
 	return ( not blocked ), {x=newX, y=newY, z=newZ}
 end
 
@@ -118,13 +121,11 @@ function TaskQueueBehaviour:ProgressQueue()
 				spGiveOrderToUnit( self.unitID, CMD.MOVE, { p.x, p.y, p.z }, {} )
 				self.progress = false
 			elseif action == "moverelative" then
-				local upos = spGetUnitPosition(self.unitID)
-				local newpos = {}
-				newpos.x = upos.x + value.position.x
-				newpos.y = upos.y + value.position.y
-				newpos.z = upos.z + value.position.z
-				local p = newpos
-				spGiveOrderToUnit( self.unitID, CMD.MOVE, { p.x, p.y, p.z }, {} )
+				local ux, uy, uz = spGetUnitPosition(self.unitID)
+				local px = ux + value.position.x
+				local py = uy + value.position.y
+				local pz = uz + value.position.z
+				spGiveOrderToUnit( self.unitID, CMD.MOVE, { px, py, pz }, {} )
 				self.progress = false
 			end
 		else
@@ -135,10 +136,10 @@ function TaskQueueBehaviour:ProgressQueue()
 				uDefID = UnitDefNames[value].id
 				if uDefID ~= nil then
 					if self:CanBuild(uDefID) then
+						local bx, by, bz = spGetUnitPosition(self.unitID)
 						if UnitDefs[uDefID].extractsMetal > 0 then
 							-- find a free spot!
-							local p = spGetUnitPosition(self.unitID)
-							p = self.ai.metalspothandler:ClosestFreeSpot(uDefID,p)
+							p = self.ai.metalspothandler:ClosestFreeSpot(uDefID, {x=bx, y=by, z=bz})
 							if p ~= nil then
 								spGiveOrderToUnit( self.unitID, -uDefID, { p.x, p.y, p.z }, {} )
 								success = true 
@@ -147,7 +148,7 @@ function TaskQueueBehaviour:ProgressQueue()
 								self.progress = true
 							end
 						else
-							local p = self:FindClosestBuildSite(uDefID, spGetUnitPosition(self.unitID))
+							local p = self:FindClosestBuildSite(uDefID, {x=bx, y=by, z=bz})
 							spGiveOrderToUnit( self.unitID, -uDefID, { p.x, p.y, p.z }, {} )
 							success = true
 							self.progress = not success
@@ -210,14 +211,14 @@ function TaskQueueBehaviour:FindClosestBuildSite(unitDefID, builderpos, searchra
 			if x < 0 then x = 0 elseif x > maxX then x = maxX end
 			if z < 0 then z = 0 elseif z > maxZ then z = maxZ end
 			local y = spGetGroundHeight(x,z)
-			local buildable, position = canBuildHere(unittype, {x=x, y=y, z=z})
+			local buildable, position = canBuildHere(unitDefID, {x=x, y=y, z=z})
 			if buildable then
 				position = validFunction(position)
 				if position then return position end
 			end
 		end 
 	end
-	local lastDitch, lastDitchPos = canBuildHere(unittype, builderpos)
+	local lastDitch, lastDitchPos = canBuildHere(unitDefID, builderpos)
 	if lastDitch then
 		lastDitchPos = validFunction(lastDitchPos)
 		if lastDitchPos then return lastDitchPos end
