@@ -33,6 +33,7 @@ local spGetTeamStartPosition = Spring.GetTeamStartPosition
 local spGetTeamUnits = Spring.GetTeamUnits
 local spGetAllUnits = Spring.GetAllUnits
 local spGetUnitTeam = Spring.GetUnitTeam
+local spGetUnitPosition = Spring.GetUnitPosition
 
 local function prepareTheAI(thisAI)
 	if not thisAI.modules then thisAI:Init() end
@@ -73,26 +74,26 @@ function gadget:Initialize()
 	-- add allied teams for each AI
 	for i = 1, #AIs do
     		local thisAI = AIs[i]
-		alliedTeamIds = {}
-		enemyTeamIds = {}
+		alliedTeamIDs = {}
+		enemyTeamIDs = {}
 		for i=1,#teamList do
 			if (spAreTeamsAllied(thisAI.id,teamList[i])) then
-				alliedTeamIds[teamList[i]] = true
+				alliedTeamIDs[teamList[i]] = true
 			else
-				enemyTeamIds[teamList[i]] = true
+				enemyTeamIDs[teamList[i]] = true
 			end
 		end
-		-- spEcho("AI "..thisAI.id.." : allies="..#alliedTeamIds.." enemies="..#enemyTeamIds)
-		thisAI.alliedTeamIds = alliedTeamIds
-		thisAI.enemyTeamIds = enemyTeamIds
+		-- spEcho("AI "..thisAI.id.." : allies="..#alliedTeamIDs.." enemies="..#enemyTeamIDs)
+		thisAI.alliedTeamIDs = alliedTeamIDs
+		thisAI.enemyTeamIDs = enemyTeamIDs
 	end
 
 	-- catch up to started game
 	if Spring.GetGameFrame() > 1 then
 		self:GameStart()
 		-- catch up to current units
-		for _,uId in ipairs(spGetAllUnits()) do
-			self:UnitCreated(uId, Spring.GetUnitDefID(uId), Spring.GetUnitTeam(uId))
+		for _,uID in ipairs(spGetAllUnits()) do
+			self:UnitCreated(uID, Spring.GetUnitDefID(uID), Spring.GetUnitTeam(uID))
 		end
 	end
 end
@@ -110,33 +111,33 @@ function gadget:GameStart()
 end
 
 
-function gadget:GameFrame(n) 
-
-	-- for each AI...
+function gadget:GameFrame(frame)
     for i = 1, #AIs do
-    		local thisAI = AIs[i]
-        
+    	local thisAI = AIs[i]
         -- update sets of unit ids : own, friendlies, enemies
-		thisAI.ownUnitIds = {}
-        thisAI.friendlyUnitIds = {}
-        thisAI.alliedUnitIds = {}
-        thisAI.enemyUnitIds = {}
-
-        for _,uId in ipairs(spGetAllUnits()) do
-        	if (spGetUnitTeam(uId) == thisAI.id) then
-        		thisAI.ownUnitIds[uId] = true
-        		thisAI.friendlyUnitIds[uId] = true
-        	elseif (thisAI.alliedTeamIds[spGetUnitTeam(uId)] or spGetUnitTeam(uId) == thisAI.id) then
-        		thisAI.alliedUnitIds[uId] = true
-        		thisAI.friendlyUnitIds[uId] = true
+        local ownUnitID, friendlyUnitID, alliedUnitID, enemyUnitID = {}, {}, {}, {}
+        local ownUnits, friendlyUnits, alliedUnits, enemyUnits = {}, {}, {}, {}
+        for _,uID in ipairs(spGetAllUnits()) do
+        	if (spGetUnitTeam(uID) == thisAI.id) then
+        		ownUnitID[uID] = true
+        		friendlyUnitID[uID] = true
+        		ownUnits[#ownUnits+1] = uID
+        		friendlyUnits[#friendlyUnits+1] = uID
+        	elseif (thisAI.alliedTeamIDs[spGetUnitTeam(uID)] or spGetUnitTeam(uID) == thisAI.id) then
+        		alliedUnitID[uID] = true
+        		friendlyUnitID[uID] = true
+        		alliedUnits[#alliedUnits+1] = uID
+        		friendlyUnits[#friendlyUnits+1] = uID
         	else
-        		thisAI.enemyUnitIds[uId] = true
+        		enemyUnitID[uID] = true
+        		enemyUnits[#enemyUnits+1] = uID
         	end
-        end 
-	
+        end
+        thisAI.ownUnitID, thisAI.friendlyUnitID, thisAI.alliedUnitID, thisAI.enemyUnitID = ownUnitID, friendlyUnitID, alliedUnitID, enemyUnitID
+        thisAI.ownUnits, thisAI.friendlyUnits, thisAI.alliedUnits, thisAI.enemyUnits = ownUnits, friendlyUnits, alliedUnits, enemyUnits
 		-- run AI game frame update handlers
 		prepareTheAI(thisAI)
-		thisAI:Update()
+		thisAI:Update(frame)
     end
 end
 

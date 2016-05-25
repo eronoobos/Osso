@@ -19,7 +19,7 @@ function AI:Init()
 	end
 end
 
-function AI:Update()
+function AI:Update(frame)
 	if self.gameend == true then
 		return
 	end
@@ -27,7 +27,7 @@ function AI:Update()
 		if m == nil then
 			Spring.Echo("nil module!")
 		else
-			m:Update()
+			m:Update(frame)
 		end
 	end
 end
