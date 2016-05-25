@@ -10,28 +10,35 @@ function MetalSpotHandler:internalName()
 end
 
 function MetalSpotHandler:Init()
-	self.spots = game.map:GetMetalSpots()
+	self.spots = osso_include("metal")
 end
 
-function distance(pos1,pos2)
+local function distance(pos1,pos2)
 	local xd = pos1.x-pos2.x
 	local yd = pos1.z-pos2.z
 	dist = math.sqrt(xd*xd + yd*yd)
 	return dist
 end
 
-function MetalSpotHandler:ClosestFreeSpot(unittype,position)
+local function canBuildHere(unitDefID, position) -- returns boolean
+	local newX, newY, newZ = Spring.Pos2BuildPos(unitDefID, position.x, position.y, position.z)
+	local blocked = Spring.TestBuildOrder(unitDefID, newX, newY, newZ, 1) == 0
+	-- Spring.Echo(unittype:Name(), newX, newY, newZ, blocked)
+	return ( not blocked ), {x=newX, y=newY, z=newZ}
+end
+
+function MetalSpotHandler:ClosestFreeSpot(unitDefID, position)
 	local pos = nil
 	local bestDistance = 10000
 
-	spotCount = game.map:SpotCount()
 	for i,v in ipairs(self.spots) do
 		local p = v
 		local dist = distance(position,p)
 		if dist < bestDistance then
-			if game.map:CanBuildHere(unittype,p) then
+			local can, bp = canBuildHere(unitDefID, p)
+			if can then
 				bestDistance = dist
-				pos = p
+				pos = bp
 			end
 		end
 	end

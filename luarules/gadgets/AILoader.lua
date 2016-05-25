@@ -34,6 +34,7 @@ local spGetTeamUnits = Spring.GetTeamUnits
 local spGetAllUnits = Spring.GetAllUnits
 local spGetUnitTeam = Spring.GetUnitTeam
 local spGetUnitPosition = Spring.GetUnitPosition
+local spGiveOrderToUnit = Spring.GiveOrderToUnit
 
 local function prepareTheAI(thisAI)
 	if not thisAI.modules then thisAI:Init() end
@@ -136,6 +137,7 @@ function gadget:GameFrame(frame)
         thisAI.ownUnitID, thisAI.friendlyUnitID, thisAI.alliedUnitID, thisAI.enemyUnitID = ownUnitID, friendlyUnitID, alliedUnitID, enemyUnitID
         thisAI.ownUnits, thisAI.friendlyUnits, thisAI.alliedUnits, thisAI.enemyUnits = ownUnits, friendlyUnits, alliedUnits, enemyUnits
 		-- run AI game frame update handlers
+		thisAI.frame = frame
 		prepareTheAI(thisAI)
 		thisAI:Update(frame)
     end

@@ -8,13 +8,10 @@
 
 BootBehaviour = class(Behaviour)
 
-local CMD_MOVE_STATE = 50
 local MOVESTATE_HOLDPOS = 0
 
 function BootBehaviour:Init()
 	self.waiting = true
-	self.id = self.unit:Internal():ID()
-	self.name = self.unit:Internal():Name()
 	self.finished = false
 	self.count = 150
 	self.unit:ElectBehaviour()
@@ -49,12 +46,12 @@ end
 
 function BootBehaviour:Priority()
 	-- don't apply to starting units
-	if game:Frame() < 5 then
+	if self.ai.frame < 5 then
 		return 0
 	end
 
 	-- don't apply to structures
-	if self.unit:Internal():CanMove() == false then
+	if not self.unit.def.canMove then
 		return 0
 	end
 	if self.waiting then
@@ -66,10 +63,5 @@ end
 
 -- set to hold position while being repaired after resurrect
 function BootBehaviour:SetMoveState()
-	local thisUnit = self.unit
-	if thisUnit then
-		local floats = api.vectorFloat()
-		floats:push_back(MOVESTATE_HOLDPOS)
-		thisUnit:Internal():ExecuteCustomCommand(CMD_MOVE_STATE, floats)
-	end
+	spGiveOrderToUnit( self.unitID, CMD.MOVE_STATE, { MOVESTATE_HOLDPOS }, {} )
 end

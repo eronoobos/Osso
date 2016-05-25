@@ -28,6 +28,7 @@ function Behaviour:SetUnit(unit)
 	self.unit = unit
 	self.ai = unit.ai
 	self.unitID = unit.unitID
+	self.name = unit:Name()
 end
 
 function Behaviour:IsActive()
