@@ -35,6 +35,7 @@ local spGetAllUnits = Spring.GetAllUnits
 local spGetUnitTeam = Spring.GetUnitTeam
 local spGetUnitPosition = Spring.GetUnitPosition
 local spGiveOrderToUnit = Spring.GiveOrderToUnit
+local spGetGroundHeight = Spring.GetGroundHeight
 
 local function prepareTheAI(thisAI)
 	if not thisAI.modules then thisAI:Init() end
