@@ -1,5 +1,8 @@
 AI = class(AIBase)
 
+local spGetTeamInfo = Spring.GetTeamInfo
+local spGetTeamStartPosition = Spring.GetTeamStartPosition
+
 function AI:SetTeamID(teamID)
 	self.id = teamID
 end
@@ -9,6 +12,10 @@ function AI:SetAllyID(allyID)
 end
 
 function AI:Init()
+	local _,_,_,isAI,side = spGetTeamInfo(thisAI.id)
+	self.side = side
+	local x,y,z = spGetTeamStartPosition(thisAI.id)
+	self.startPos = {x=x,y=y,z=z}
 	Spring.Echo("Osso - playing:".. Game.gameShortName .. " on: " .. Game.mapName)
 	self.modules = {}
 	if next(modules) ~= nil then

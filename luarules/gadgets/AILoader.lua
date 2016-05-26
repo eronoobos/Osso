@@ -2,7 +2,7 @@ function gadget:GetInfo()
    return {
       name = "Osso",
       desc = "Osso Lua AI Framework, based on Shard by AF",
-      author = "eronoobos, based on gadget by raaar, and Shard by AF",
+      author = "eronoobos, based on gadget by raaar and Shard by AF",
       date = "May 2016",
       license = "whatever",
       layer = 999999,
@@ -33,6 +33,8 @@ local spGetTeamStartPosition = Spring.GetTeamStartPosition
 local spGetTeamUnits = Spring.GetTeamUnits
 local spGetAllUnits = Spring.GetAllUnits
 local spGetUnitTeam = Spring.GetUnitTeam
+local spGetUnitDefID = Spring.GetUnitDefID
+local spGetGameFrame = Spring.GetGameFrame
 
 local function prepareTheAI(thisAI)
 	if not thisAI.modules then thisAI:Init() end
@@ -88,11 +90,14 @@ function gadget:Initialize()
 	end
 
 	-- catch up to started game
-	if Spring.GetGameFrame() > 1 then
+	if spGetGameFrame() > 1 then
 		self:GameStart()
 		-- catch up to current units
-		for _,uID in ipairs(spGetAllUnits()) do
-			self:UnitCreated(uID, Spring.GetUnitDefID(uID), Spring.GetUnitTeam(uID))
+		for _,uID in pairs(spGetAllUnits()) do
+			local uDefID = spGetUnitDefID(uID)
+			local uTeamID = spGetUnitTeam(uID)
+			self:UnitCreated(uID, uDefID, uTeamID)
+			self:UnitFinished(uID, uDefID, uTeamID)
 		end
 	end
 end
@@ -100,12 +105,8 @@ end
 function gadget:GameStart() 
     -- Initialise AIs
     for i = 1, #AIs do
-    		local thisAI = AIs[i]
-        local _,_,_,isAI,side = spGetTeamInfo(thisAI.id)
-		thisAI.side = side
-		local x,y,z = spGetTeamStartPosition(thisAI.id)
-		thisAI.startPos = {x,y,z}
-		if not thisAI.modules then thisAI:Init() end
+    	local thisAI = AIs[i]
+		prepareTheAI(thisAI)
     end
 end
 
@@ -113,6 +114,7 @@ end
 function gadget:GameFrame(frame)
     for i = 1, #AIs do
     	local thisAI = AIs[i]
+    	prepareTheAI(thisAI)
         -- update sets of unit ids : own, friendlies, enemies
         local ownUnitID, friendlyUnitID, alliedUnitID, enemyUnitID = {}, {}, {}, {}
         local ownUnits, friendlyUnits, alliedUnits, enemyUnits = {}, {}, {}, {}
@@ -136,7 +138,6 @@ function gadget:GameFrame(frame)
         thisAI.ownUnits, thisAI.friendlyUnits, thisAI.alliedUnits, thisAI.enemyUnits = ownUnits, friendlyUnits, alliedUnits, enemyUnits
 		-- run AI game frame update handlers
 		thisAI.frame = frame
-		prepareTheAI(thisAI)
 		thisAI:Update(frame)
     end
 end

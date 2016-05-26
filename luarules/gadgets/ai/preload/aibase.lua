@@ -7,7 +7,7 @@ end)
 function AIBase:Init()
 end
 
-function AIBase:Update()
+function AIBase:Update(frame)
 end
 
 function AIBase:GameEnd()
@@ -16,25 +16,23 @@ end
 function AIBase:GameMessage(text)
 end
 
-function AIBase:UnitCreated(engineunit)
+function AIBase:UnitCreated(unitID, unitDefID, teamID, builderID)
 end
 
-function AIBase:UnitFinished(engineunit)
+function AIBase:UnitFinished(unitID, unitDefID, teamID)
 end
 
-function AIBase:UnitGiven(engineunit)
-	self:UnitCreated(engineunit)
-	self:UnitFinished(engineunit)
+function AIBase:UnitGiven(unitID, unitDefID, teamID, oldTeamID)
 end
 
 
-function AIBase:UnitDestroyed(engineunit)
+function AIBase:UnitDestroyed(unitID, unitDefID, teamID, attackerId, attackerDefId, attackerTeamId)
 end
 
-function AIBase:UnitIdle(engineunit)
+function AIBase:UnitIdle(unitID, unitDefID, teamID)
 end
 
-function AIBase:UnitDamaged(engineunit,enginedamage)
+function AIBase:UnitDamaged(unitID, unitDefID, unitTeamId, damage, paralyzer, weaponDefId, projectileId, attackerId, attackerDefId, attackerTeamId)
 end
-function AIBase:UnitMoveFailed(engineunit)
+function AIBase:UnitMoveFailed(unitID)
 end
